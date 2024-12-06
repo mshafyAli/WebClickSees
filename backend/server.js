@@ -14,6 +14,9 @@ connectDB();
 
 app.use("/api/tracking", trackingRoutes);
 
+app.get("/", (req, res) => {
+    res.status(200).json({ message: "Server is running and this is the root test response!" });
+  })
 
 
 const PORT = process.env.PORT || 5000;
