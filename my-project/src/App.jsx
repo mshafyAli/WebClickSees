@@ -8,7 +8,7 @@ function App() {
 
   const handleSearch = async () => {
     try {
-      const response = await axios.post("https://yourserver.com/api/tracking", {
+      const response = await axios.post("https://webclicksees.onrender.com/api/tracking", {
         domain,
         ip: "127.0.0.1", // Replace with dynamic IP
         gclid: "test-gclid", // Test GCLID
