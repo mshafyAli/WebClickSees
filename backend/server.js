@@ -4,6 +4,7 @@ const dotenv = require("dotenv");
 const cors = require("cors");
 const connectDB = require("./config/db");
 const trackingRoutes = require("./routes/trackingRoutes");
+const scriptRoute = require("./routes/ScriptRoute");
 
 dotenv.config();
 
@@ -19,7 +20,9 @@ app.use(cors({
 // Connect to MongoDB
 connectDB();
 
-app.use("/api/tracking", trackingRoutes);
+// Routes
+app.use(trackingRoutes);
+app.use(scriptRoute);
 
 app.get("/", (req, res) => {
     res.status(200).json({ message: "Server is running and this is the root test response!" });
