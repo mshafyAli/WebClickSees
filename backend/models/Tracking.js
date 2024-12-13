@@ -11,16 +11,14 @@
 
 // module.exports = mongoose.model("Tracking", trackingSchema);
 
-
 const mongoose = require("mongoose");
 
-const TrackingSchema = new mongoose.Schema({
+const trackingSchema = new mongoose.Schema({
   domain: { type: String, required: true },
-  gclid: { type: String, default: null },
+  gclid: { type: String, required: false },
   ip: { type: String, required: true },
-  country: { type: String, default: "Unknown" },
-  isVpn: { type: Boolean, default: false },
-  createdAt: { type: Date, default: Date.now },
+  country: { type: String, required: false },
+  isVpn: { type: Boolean, required: false },
 });
 
-module.exports = mongoose.model("Tracking", TrackingSchema);
+module.exports = mongoose.model("Tracking", trackingSchema);
