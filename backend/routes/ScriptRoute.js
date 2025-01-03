@@ -48,7 +48,7 @@ const express = require("express");
 const router = express.Router();
 
 const GEOLOCATION_API_KEY = "6db4032c0324747c5d643eb5a15d5181"; // Replace with your API key
-const GEOLOCATION_URL = "http://api.ipstack.com";
+const GEOLOCATION_URL = "https://api.ipstack.com";
 
 // Serve the script
 router.get("/script.js", (req, res) => {
