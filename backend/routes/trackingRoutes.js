@@ -55,42 +55,74 @@
 
 // I tried new code for data save in database
 
+// const express = require("express");
+// const router = express.Router();
+// const mongoose = require("mongoose");
+
+// // Define the schema and model for tracking
+// const trackingSchema = new mongoose.Schema({
+//   ip: String,
+//   country: String,
+//   isVpn: Boolean,
+//   domain: String,
+//   gclid: String,
+//   timestamp: { type: Date, default: Date.now },
+// });
+
+// const Tracking = mongoose.model("Tracking", trackingSchema);
+
+// // Handle tracking POST request
+// router.post("/api/tracking", async (req, res) => {
+//   try {
+//     const { ip, country, isVpn, domain, gclid } = req.body;
+
+//     // Create a new tracking record
+//     const trackingData = new Tracking({
+//       ip,
+//       country,
+//       isVpn,
+//       domain,
+//       gclid,
+//     });
+
+//     // Save to the database
+//     await trackingData.save();
+
+//     res.status(201).json({ message: "Tracking data saved successfully." });
+//   } catch (error) {
+//     console.error("Error saving tracking data:", error.message);
+//     res.status(500).json({ error: "Failed to save tracking data." });
+//   }
+// });
+
+// module.exports = router;
+
+// newcode for test
 const express = require("express");
 const router = express.Router();
-const mongoose = require("mongoose");
+const bodyParser = require("body-parser");
+const { TrackingModel } = require("../models/Tracking"); // Your database model to save tracking data
 
-// Define the schema and model for tracking
-const trackingSchema = new mongoose.Schema({
-  ip: String,
-  country: String,
-  isVpn: Boolean,
-  domain: String,
-  gclid: String,
-  timestamp: { type: Date, default: Date.now },
-});
+// Middleware to parse JSON bodies
+router.use(bodyParser.json());
 
-const Tracking = mongoose.model("Tracking", trackingSchema);
-
-// Handle tracking POST request
+// Route to handle tracking data
 router.post("/api/tracking", async (req, res) => {
   try {
     const { ip, country, isVpn, domain, gclid } = req.body;
 
-    // Create a new tracking record
-    const trackingData = new Tracking({
-      ip,
-      country,
-      isVpn,
-      domain,
-      gclid,
-    });
+    if (!ip || !country || !domain) {
+      return res.status(400).json({ error: "Missing required fields." });
+    }
 
-    // Save to the database
+    // Save the data to the database
+    const trackingData = new TrackingModel({ ip, country, isVpn, domain, gclid });
     await trackingData.save();
 
-    res.status(201).json({ message: "Tracking data saved successfully." });
+    // Respond to the client
+    res.status(201).json({ message: "Tracking data saved successfully!" });
   } catch (error) {
-    console.error("Error saving tracking data:", error.message);
+    console.error("Error saving tracking data:", error);
     res.status(500).json({ error: "Failed to save tracking data." });
   }
 });
