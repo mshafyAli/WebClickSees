@@ -51,14 +51,12 @@
 
 // module.exports = router;
 
-
-
 // I tried new code for data save in database
 // const express = require("express");
 // const axios = require("axios");
 // const router = express.Router();
 // const Tracking = require("../models/Tracking");
-// const GEOLOCATION_API_KEY = "6db4032c0324747c5d643eb5a15d5181"; 
+// const GEOLOCATION_API_KEY = "6db4032c0324747c5d643eb5a15d5181";
 // const GEOLOCATION_URL = "http://api.ipstack.com";
 
 // // Automatically track and save user information
@@ -102,8 +100,7 @@
 
 // module.exports = router;
 
-
-// 3rd new code for tracking
+// 3rd new code for tracking this code is working fine nut not show isvpn true always show false
 const express = require("express");
 const axios = require("axios");
 const router = express.Router();
@@ -138,7 +135,9 @@ router.get("/api/track", async (req, res) => {
 
     if (!ip || ip === "unknown" || !domain) {
       console.error("Error: Missing required fields: IP or domain");
-      return res.status(400).json({ error: "Missing required fields: IP or domain" });
+      return res
+        .status(400)
+        .json({ error: "Missing required fields: IP or domain" });
     }
 
     // Fetch geolocation data for the IP
@@ -164,6 +163,15 @@ router.get("/api/track", async (req, res) => {
     res.status(201).send("// Tracking information logged successfully.");
   } catch (error) {
     console.error("Error tracking user data:", error.message); // Log the error message
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+router.get("/api/tracking-records", async (req, res) => {
+  try {
+    const records = await Tracking.find();
+    res.status(200).json(records);
+  } catch (error) {
+    console.error("Error fetching tracking records:", error.message);
     res.status(500).json({ error: "Internal server error" });
   }
 });
