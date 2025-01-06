@@ -332,15 +332,41 @@ router.get("/api/track", async (req, res) => {
       return res.status(409).json({ message: "IP already tracked", existingRecord });
     }
 
+    // Skip ProxyCheck for local IPs (127.0.0.1 or ::1)
+    if (ip === "127.0.0.1" || ip === "::1") {
+      console.log("Local IP detected, skipping geolocation and VPN check.");
+      const trackingData = new Tracking({
+        domain,
+        gclid,
+        ip,
+        country: "Localhost",
+        isVpn: false,
+      });
+
+      await trackingData.save();
+      console.log("Tracking Data Saved for Localhost:", trackingData); // Log the saved data
+      return res.status(201).send("Tracking information logged successfully (Local IP).");
+    }
+
     // Fetch geolocation and VPN data for the IP using ProxyCheck.io API
     const geoResponse = await axios.get(`${PROXYCHECK_URL}/${ip}`, {
       params: { key: PROXYCHECK_API_KEY },
     });
+
+    // Log the full response to see the structure
+    console.log("ProxyCheck Response:", geoResponse.data);
+
+    // Check if the expected data exists
     const geoData = geoResponse.data[ip];
+    if (!geoData) {
+      console.error("Error: No data found for the provided IP");
+      return res.status(400).json({ error: "No geolocation data found for the provided IP" });
+    }
+
     console.log("ProxyCheck Data:", geoData); // Log the data from ProxyCheck
 
     // Check if VPN is detected
-    const isVpn = geoData && geoData.proxy === "yes"; // `proxy` field indicates VPN usage
+    const isVpn = geoData.proxy === "yes"; // `proxy` field indicates VPN usage
 
     // Save tracking data to the database
     const trackingData = new Tracking({
@@ -389,5 +415,7 @@ router.delete("/api/tracking-records/:id", async (req, res) => {
 });
 
 module.exports = router;
+
+
 
 
