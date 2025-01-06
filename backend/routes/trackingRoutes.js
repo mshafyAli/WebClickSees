@@ -294,7 +294,7 @@ const Tracking = require("../models/Tracking");
 
 // Replace with your valid ProxyCheck API key
 const PROXYCHECK_API_KEY = "5648s6-c8489j-4s6hge-o40023"; 
-const PROXYCHECK_URL = "https://proxycheck.io";
+const PROXYCHECK_URL = "https://proxycheck.io/v2";
 
 // Helper function to extract the actual client IP
 function getClientIP(req) {
