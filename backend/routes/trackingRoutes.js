@@ -293,8 +293,8 @@ const router = express.Router();
 const Tracking = require("../models/Tracking");
 
 // Replace with your valid ProxyCheck API key
-const PROXYCHECK_API_KEY = "9379j7-x973t2-401297-k8212k"; 
-const PROXYCHECK_URL = "https://proxycheck.io/v2";
+const PROXYCHECK_API_KEY = "5648s6-c8489j-4s6hge-o40023"; 
+const PROXYCHECK_URL = "https://proxycheck.io";
 
 // Helper function to extract the actual client IP
 function getClientIP(req) {
