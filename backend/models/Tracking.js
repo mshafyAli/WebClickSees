@@ -8,6 +8,7 @@ const trackingSchema = new mongoose.Schema({
   ip: { type: String, required: true, unique: true },
   country: { type: String, required: false },
   isVpn: { type: Boolean, required: false },
+  date: { type: Date, default: Date.now },
 });
 
 module.exports = mongoose.model("Tracking", trackingSchema);

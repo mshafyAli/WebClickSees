@@ -67,6 +67,7 @@ const TrackingTable = () => {
             <TableHead>Ip</TableHead>
             <TableHead className="text-left">Country</TableHead>
             <TableHead className="text-left">VPN</TableHead>
+            <TableHead className="text-left">Date</TableHead>
             <TableHead className="text-left">Delete</TableHead>
 
           </TableRow>
@@ -84,6 +85,8 @@ const TrackingTable = () => {
                 <TableCell className="text-left">
                   {record.isVpn ? "Yes" : "No"}
                 </TableCell>
+                <TableCell>{record.date}</TableCell>
+
                 <TableCell className="text-left">
                   <button
                     className="px-4 py-2 text-white bg-red-500 rounded hover:bg-red-600"
