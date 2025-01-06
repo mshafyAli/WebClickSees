@@ -220,6 +220,13 @@ router.get("/api/track", async (req, res) => {
         .json({ error: "Missing required fields: IP or domain" });
     }
 
+    // Check if IP already exists
+    const existingRecord = await Tracking.findOne({ ip });
+
+    if (existingRecord) {
+      return res.status(409).json({ message: "IP already tracked", existingRecord });
+    }
+
     // Fetch geolocation data for the IP
     const geoResponse = await axios.get(`${GEOLOCATION_URL}/${ip}`, {
       params: { access_key: GEOLOCATION_API_KEY },
