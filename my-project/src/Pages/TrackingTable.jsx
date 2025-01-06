@@ -72,32 +72,38 @@ const TrackingTable = () => {
 
           </TableRow>
         </TableHeader>
+       
         <TableBody>
-          {records
-            .slice()
-            .reverse()
-            .map((record) => (
-              <TableRow key={record._id}>
-                <TableCell className="font-medium">{record.domain}</TableCell>
-                <TableCell>{record.gclid || "N/A"}</TableCell>
-                <TableCell>{record.ip}</TableCell>
-                <TableCell className="text-left">{record.country}</TableCell>
-                <TableCell className="text-left">
-                  {record.isVpn ? "Yes" : "No"}
-                </TableCell>
-                <TableCell>{record.date}</TableCell>
+  {records
+    .slice()
+    .reverse()
+    .map((record) => {
+      // Format the date in 'MM/DD/YYYY' format (or use a format that suits you)
+      const formattedDate = record.date ? new Date(record.date).toLocaleDateString() : "N/A";
+      
+      return (
+        <TableRow key={record._id}>
+          <TableCell className="font-medium">{record.domain}</TableCell>
+          <TableCell>{record.gclid || "N/A"}</TableCell>
+          <TableCell>{record.ip}</TableCell>
+          <TableCell className="text-left">{record.country}</TableCell>
+          <TableCell className="text-left">
+            {record.isVpn ? "Yes" : "No"}
+          </TableCell>
+          <TableCell>{formattedDate}</TableCell>
 
-                <TableCell className="text-left">
-                  <button
-                    className="px-4 py-2 text-white bg-red-500 rounded hover:bg-red-600"
-                    onClick={() => handleDelete(record._id)}
-                  >
-                    Delete
-                  </button>
-                </TableCell>
-              </TableRow>
-            ))}
-        </TableBody>
+          <TableCell className="text-left">
+            <button
+              className="px-4 py-2 text-white bg-red-500 rounded hover:bg-red-600"
+              onClick={() => handleDelete(record._id)}
+            >
+              Delete
+            </button>
+          </TableCell>
+        </TableRow>
+      );
+    })}
+</TableBody>
       </Table>
     </div>
   );
