@@ -22,7 +22,7 @@ const TrackingTable = () => {
           "https://webclicksees.onrender.com/api/tracking-records"
         );
         const data = await response.json();
-        setRecords(data);
+        setRecords(data.filter((record) => record.domain === "the-academians.com"));
         setLoading(false);
       } catch (error) {
         console.error("Error fetching tracking records:", error);

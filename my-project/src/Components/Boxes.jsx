@@ -6,7 +6,7 @@ const Boxes = () => {
     <div>
       <div className="flex flex-wrap max-w-[84rem] mx-auto">
         <div className="w-1/4 p-4 text-white">
-          <Link to="/Records">
+          <Link to="/academians.com.au">
             <div className="bg-red-600 p-10 rounded-lg shadow-md text-center">
               <h2 className="text-xl font-bold">Academians.com.au</h2>
               <p className="text-sm ">Click here to check tracking</p>
@@ -14,10 +14,12 @@ const Boxes = () => {
           </Link>
         </div>
         <div className="w-1/4 p-4 text-white">
-          <div className="bg-red-600 p-10 rounded-lg shadow-md text-center">
-            <h2 className="text-xl font-bold">The Academians.com</h2>
-            <p className="text-sm">Click here to check tracking</p>
-          </div>
+          <Link to={"/the-academians.com"}>
+            <div className="bg-red-600 p-10 rounded-lg shadow-md text-center">
+              <h2 className="text-xl font-bold">The Academians.com</h2>
+              <p className="text-sm">Click here to check tracking</p>
+            </div>
+          </Link>
         </div>
         <div className="w-1/4 p-4 text-white">
           <div className="bg-red-600 p-10 rounded-lg shadow-md text-center">

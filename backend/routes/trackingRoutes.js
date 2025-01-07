@@ -261,10 +261,7 @@ router.get("/api/track", async (req, res) => {
     const domain = req.query.domain || req.hostname;
     const gclid = req.query.gclid || null;
 
-    const existingRecord = await Tracking.findOne({ ip });
-    if (existingRecord) {
-      return res.status(409).json({ message: "IP already tracked", existingRecord });
-    }
+    
 
     const geoResponse = await axios.get(`${GEOLOCATION_URL}/${ip}`, {
       params: { access_key: GEOLOCATION_API_KEY },
@@ -293,6 +290,12 @@ router.get("/api/track", async (req, res) => {
 // Fetch tracking records
 router.get("/api/tracking-records", async (req, res) => {
   try {
+
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+    await Tracking.deleteMany({ date: { $lt: sevenDaysAgo } });
+
     const records = await Tracking.find();
     res.status(200).json(records);
   } catch (error) {
@@ -304,8 +307,8 @@ router.get("/api/tracking-records", async (req, res) => {
 
 router.delete("/api/tracking-records/:id", async (req, res) => {
   const { id } = req.params;
-  const deletedRecord = await Tracking.findByIdAndDelete(id);
   try {
+    const deletedRecord = await Tracking.findByIdAndDelete(id);
     if (!deletedRecord) {
       return res.status(404).json({ error: "Record not found" });
     }
