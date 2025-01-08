@@ -12,7 +12,7 @@ const app = express();
 app.use(express.json());
 
 app.use(cors({
-    origin: ["https://clicks.encoders.com.pk", "https://academians.com.au","https://the-academians.com","https://britishphdwriters.co.uk"], // Replace with your frontend URL
+    origin: ["https://clicks.encoders.com.pk", "https://academians.com.au","https://the-academians.com","https://britishphdwriters.co.uk","https://aussiephdwriters.com.au"], // Replace with your frontend URL
     methods: "GET,POST,PUT,DELETE", 
     credentials: true, // Allow cookies to be sent
   }));
