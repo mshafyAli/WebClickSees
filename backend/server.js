@@ -12,7 +12,7 @@ const app = express();
 app.use(express.json());
 
 app.use(cors({
-    origin: ["http://localhost:5173", "http://academians.com.au","http://the-academians.com"], // Replace with your frontend URL
+    origin: ["https://clicks.encoders.com.pk", "https://academians.com.au","https://the-academians.com"], // Replace with your frontend URL
     methods: "GET,POST,PUT,DELETE", 
     credentials: true, // Allow cookies to be sent
   }));

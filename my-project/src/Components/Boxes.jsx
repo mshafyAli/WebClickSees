@@ -22,15 +22,17 @@ const Boxes = () => {
           </Link>
         </div>
         <div className="w-1/4 p-4 text-white">
-          <div className="bg-red-600 p-10 rounded-lg shadow-md text-center">
-            <h2 className="text-xl font-bold">Box 3</h2>
-            <p className="text-sm">This is the content of box 3</p>
-          </div>
+          <Link to={"/aussiephdwriter.com.au"}>
+            <div className="bg-red-600 p-10 rounded-lg shadow-md text-center">
+              <h2 className="text-xl font-bold">APW</h2>
+              <p className="text-sm">Click here to check tracking</p>
+            </div>
+          </Link>
         </div>
         <div className="w-1/4 p-4 text-white">
           <div className="bg-red-600 p-10 rounded-lg shadow-md text-center">
-            <h2 className="text-xl font-bold">Box 4</h2>
-            <p className="text-sm">This is the content of box 4</p>
+            <h2 className="text-xl font-bold">BPW</h2>
+            <p className="text-sm">Click here to check tracking</p>
           </div>
         </div>
       </div>

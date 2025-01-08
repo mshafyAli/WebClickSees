@@ -67,7 +67,7 @@ const TrackingTable = () => {
             <TableHead>Ip</TableHead>
             <TableHead className="text-left">Country</TableHead>
             <TableHead className="text-left">VPN</TableHead>
-            <TableHead className="text-left">Date</TableHead>
+            <TableHead className="text-left">Date & Time</TableHead>
             <TableHead className="text-left">Delete</TableHead>
 
           </TableRow>
@@ -79,7 +79,9 @@ const TrackingTable = () => {
     .reverse()
     .map((record) => {
       // Format the date in 'MM/DD/YYYY' format (or use a format that suits you)
-      const formattedDate = record.date ? new Date(record.date).toLocaleDateString() : "N/A";
+      const formattedDateTime = record.date
+          ? new Date(record.date).toLocaleString() // Includes both date and time
+          : "N/A";
       
       return (
         <TableRow key={record._id}>
@@ -90,7 +92,7 @@ const TrackingTable = () => {
           <TableCell className="text-left">
             {record.isVpn ? "Yes" : "No"}
           </TableCell>
-          <TableCell>{formattedDate}</TableCell>
+          <TableCell>{formattedDateTime}</TableCell>
 
           <TableCell className="text-left">
             <button

@@ -9,7 +9,7 @@ import {
   TableCaption,
 } from "@/Components/ui/table";
 
-const TrackingTable = () => {
+const APW = () => {
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -21,7 +21,7 @@ const TrackingTable = () => {
         );
         const data = await response.json();
         setRecords(
-          data.filter((record) => record.domain === "academians.com.au")
+          data.filter((record) => record.domain === "britishphdwriters.co.uk")
         );
         setLoading(false);
       } catch (error) {
@@ -58,7 +58,7 @@ const TrackingTable = () => {
 
   return (
     <div className="mt-12">
-      {/* <Table className="max-w-4xl mx-auto">
+      <Table className="max-w-4xl mx-auto">
         <TableCaption>A list of your recent Tracking.</TableCaption>
         <TableHeader>
           <TableRow>
@@ -67,7 +67,7 @@ const TrackingTable = () => {
             <TableHead>Ip</TableHead>
             <TableHead className="text-left">Country</TableHead>
             <TableHead className="text-left">VPN</TableHead>
-            <TableHead className="text-left">Date</TableHead>
+            <TableHead className="text-left">Date & Time</TableHead>
             <TableHead className="text-left">Delete</TableHead>
           </TableRow>
         </TableHeader>
@@ -77,9 +77,9 @@ const TrackingTable = () => {
             .slice()
             .reverse()
             .map((record) => {
-              // Format the date in 'MM/DD/YYYY' format (or use a format that suits you)
-              const formattedDate = record.date
-                ? new Date(record.date).toLocaleDateString()
+              // Format the date and time using 'toLocaleString'
+              const formattedDateTime = record.date
+                ? new Date(record.date).toLocaleString() // Includes both date and time
                 : "N/A";
 
               return (
@@ -91,7 +91,7 @@ const TrackingTable = () => {
                   <TableCell className="text-left">
                     {record.isVpn ? "Yes" : "No"}
                   </TableCell>
-                  <TableCell>{formattedDate}</TableCell>
+                  <TableCell>{formattedDateTime}</TableCell>
 
                   <TableCell className="text-left">
                     <button
@@ -105,58 +105,9 @@ const TrackingTable = () => {
               );
             })}
         </TableBody>
-      </Table> */}
-      <Table className="max-w-4xl mx-auto">
-  <TableCaption>A list of your recent Tracking.</TableCaption>
-  <TableHeader>
-    <TableRow>
-      <TableHead className="w-[100px]">Domain</TableHead>
-      <TableHead>Gclid</TableHead>
-      <TableHead>Ip</TableHead>
-      <TableHead className="text-left">Country</TableHead>
-      <TableHead className="text-left">VPN</TableHead>
-      <TableHead className="text-left">Date & Time</TableHead>
-      <TableHead className="text-left">Delete</TableHead>
-    </TableRow>
-  </TableHeader>
-
-  <TableBody>
-    {records
-      .slice()
-      .reverse()
-      .map((record) => {
-        // Format the date and time using 'toLocaleString'
-        const formattedDateTime = record.date
-          ? new Date(record.date).toLocaleString() // Includes both date and time
-          : "N/A";
-
-        return (
-          <TableRow key={record._id}>
-            <TableCell className="font-medium">{record.domain}</TableCell>
-            <TableCell>{record.gclid || "N/A"}</TableCell>
-            <TableCell>{record.ip}</TableCell>
-            <TableCell className="text-left">{record.country}</TableCell>
-            <TableCell className="text-left">
-              {record.isVpn ? "Yes" : "No"}
-            </TableCell>
-            <TableCell>{formattedDateTime}</TableCell>
-
-            <TableCell className="text-left">
-              <button
-                className="px-4 py-2 text-white bg-red-500 rounded hover:bg-red-600"
-                onClick={() => handleDelete(record._id)}
-              >
-                Delete
-              </button>
-            </TableCell>
-          </TableRow>
-        );
-      })}
-  </TableBody>
-</Table>
-
+      </Table>
     </div>
   );
 };
 
-export default TrackingTable;
+export default APW;
