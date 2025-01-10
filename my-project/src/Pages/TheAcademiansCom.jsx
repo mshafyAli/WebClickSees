@@ -24,10 +24,8 @@ const TrackingTable = () => {
         );
         const data = await response.json();
         const domainRecords = data.filter((record)=> record.domain === "the-academians.com");
-        setRecords(domainRecords)
-        setRecords(
-          data.filter((record) => record.domain === "the-academians.com")
-        );
+        setRecords(domainRecords);
+        setFilteredRecords(domainRecords);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching tracking records:", error);
@@ -37,6 +35,38 @@ const TrackingTable = () => {
 
     fetchTrackingData();
   }, []);
+
+
+  const handleFilter = () => {
+    // Validate inputs
+    if (!startDate && !endDate) {
+      setFilteredRecords(records);
+      return;
+    }
+  
+    // Convert input dates to comparable timestamps
+    const start = startDate ? new Date(startDate + 'T00:00:00').getTime() : null;
+    const end = endDate ? new Date(endDate + 'T23:59:59').getTime() : null;
+  
+    // Filter records
+    const filtered = records.filter((record) => {
+      const recordDate = new Date(record.date).getTime(); // Convert record.date to timestamp
+      if (start && end) {
+        return recordDate >= start && recordDate <= end;
+      }
+      if (start) {
+        return recordDate >= start;
+      }
+      if (end) {
+        return recordDate <= end;
+      }
+      return true; // Shouldn't reach here, but ensures no records are skipped
+    });
+  
+    // Update state
+    setFilteredRecords(filtered);
+  
+  };
 
   const handleDelete = async (id) => {
     const confirmDelete = window.confirm("Are you sure you want to delete?");
@@ -49,7 +79,9 @@ const TrackingTable = () => {
           }
         );
         if (response.ok) {
-          setRecords(records.filter((record) => record._id !== id));
+          const updatedRecords = records.filter((record) => record._id !== id);
+          setRecords(updatedRecords);
+          setFilteredRecords(updatedRecords);
         }
       }
     } catch (error) {
@@ -107,7 +139,7 @@ const TrackingTable = () => {
         </TableHeader>
 
         <TableBody>
-          {records
+          {filteredRecords
             .slice()
             .reverse()
             .map((record) => {
@@ -119,7 +151,7 @@ const TrackingTable = () => {
               return (
                 <TableRow key={record._id}>
                   <TableCell className="font-medium">{record.domain}</TableCell>
-                  <TableCell>{record.gclid || "N/A"}</TableCell>
+                  <TableCell className="max-w-[200px] overflow-auto whitespace-nowrap break-words">{record.gclid || "N/A"}</TableCell>
                   <TableCell>{record.ip}</TableCell>
                   <TableCell className="text-left">{record.country}</TableCell>
                   <TableCell className="text-left">
@@ -146,27 +178,4 @@ const TrackingTable = () => {
 
 export default TrackingTable;
 
-//     <Table className="w-full">
-//   <TableHead className="bg-gray-100">
-//     <TableRow>
-//       {/* <TableCell className="px-12 py-2 text-left">ID</TableCell> */}
-//       <TableCell className="px-6 py-2 text-left">Domain</TableCell>
-//       <TableCell className="px-12 py-2 text-left">GCLID</TableCell>
-//       <TableCell className="px-12 py-2 text-left">IP</TableCell>
-//       <TableCell className="px-12 py-2 text-left">Country</TableCell>
-//       <TableCell className="px-12 py-2 text-left">VPN</TableCell>
-//     </TableRow>
-//   </TableHead>
-//   <TableBody>
-//     {records.map((record) => (
-//       <TableRow key={record._id} className="hover:bg-gray-50">
-//         {/* <TableCell className="px-4 py-2">{record._id}</TableCell> */}
-//         <TableCell className="px-4 py-2">{record.domain}</TableCell>
-//         <TableCell className="px-4 py-2">{record.gclid || "N/A"}</TableCell>
-//         <TableCell className="px-4 py-2">{record.ip}</TableCell>
-//         <TableCell className="px-4 py-2">{record.country}</TableCell>
-//         <TableCell className="px-4 py-2">{record.isVpn ? "Yes" : "No"}</TableCell>
-//       </TableRow>
-//     ))}
-//   </TableBody>
-// </Table>
+

@@ -157,28 +157,33 @@ const TrackingTable = () => {
   }, []);
 
   const handleFilter = () => {
-    if (!startDate && !endDate) {
+    if(!startDate && !endDate){
       setFilteredRecords(records);
       return;
     }
+    
+    const start = startDate ? new Date(startDate + 'T00:00:00').getTime() : null;
+    const end = endDate ? new Date(endDate + 'T23:59:59').getTime() : null;
 
-    const filtered = records.filter((record) => {
-      const recordDate = new Date(record.date).toISOString().split("T")[0];
-      const start = startDate ? new Date(startDate).toISOString().split("T")[0] : null;
-      const end = endDate ? new Date(endDate).toISOString().split("T")[0] : null;
-
-      if (start && end) {
+    const filtered = records.filter((record)=>{
+      const recordDate = new Date(record.date).getTime();
+     
+      
+      if(start && end){
         return recordDate >= start && recordDate <= end;
-      } else if (start) {
+      }
+      if(start){
         return recordDate >= start;
-      } else if (end) {
+      }
+      if(end){
         return recordDate <= end;
       }
-      return true;
-    });
 
+      return true;
+
+    })
     setFilteredRecords(filtered);
-  };
+  }
 
   const handleDelete = async (id) => {
     const confirmDelete = window.confirm("Are you sure you want to delete?");
@@ -265,7 +270,7 @@ const TrackingTable = () => {
               return (
                 <TableRow key={record._id}>
                   <TableCell className="font-medium">{record.domain}</TableCell>
-                  <TableCell>{record.gclid || "N/A"}</TableCell>
+                  <TableCell className="max-w-[200px] overflow-auto whitespace-nowrap break-words">{record.gclid || "N/A"}</TableCell>
                   <TableCell>{record.ip}</TableCell>
                   <TableCell className="text-left">{record.country}</TableCell>
                   <TableCell className="text-left">

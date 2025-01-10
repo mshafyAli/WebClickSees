@@ -152,28 +152,39 @@ const APW = () => {
     fetchTrackingData();
   }, []);
 
+ 
+
   const handleFilter = () => {
+    // Validate inputs
     if (!startDate && !endDate) {
       setFilteredRecords(records);
       return;
     }
-
-    const filtered = records.filter((record) => {
-      const recordDate = new Date(record.date).toISOString().split("T")[0]; // Get only the date part (YYYY-MM-DD)
-      const start = startDate ? new Date(startDate).toISOString().split("T")[0] : null;
-      const end = endDate ? new Date(endDate).toISOString().split("T")[0] : null;
   
+    // Convert input dates to comparable timestamps
+    const start = startDate ? new Date(startDate + 'T00:00:00').getTime() : null;
+    const end = endDate ? new Date(endDate + 'T23:59:59').getTime() : null;
+  
+    // Filter records
+    const filtered = records.filter((record) => {
+      const recordDate = new Date(record.date).getTime(); // Convert record.date to timestamp
       if (start && end) {
-        return recordDate >= start && recordDate <= end; // Inclusive of both start and end dates
-      } else if (start) {
+        return recordDate >= start && recordDate <= end;
+      }
+      if (start) {
         return recordDate >= start;
-      } else if (end) {
+      }
+      if (end) {
         return recordDate <= end;
       }
-      return true;
+      return true; // Shouldn't reach here, but ensures no records are skipped
     });
-
+  
+    // Update state
     setFilteredRecords(filtered);
+  
+    // Debugging logs
+    console.log({ startDate, endDate, start, end, records, filtered });
   };
 
   const handleDelete = async (id) => {

@@ -42,25 +42,28 @@ const APW = () => {
       return;
     }
     
+    const start = startDate ? new Date(startDate + 'T00:00:00').getTime() : null;
+    const end = endDate ? new Date(endDate + 'T23:59:59').getTime() : null;
+
     const filtered = records.filter((record)=>{
-      const recordDate = new Date(record.date).toISOString().split("T")[0];
-      const start = new Date(startDate).toISOString().split("T")[0];
-      const end = new Date(endDate).toISOString().split("T")[0];
+      const recordDate = new Date(record.date).getTime();
+     
       
       if(start && end){
         return recordDate >= start && recordDate <= end;
       }
-      else if(start){
+      if(start){
         return recordDate >= start;
       }
-      else if(end){
+      if(end){
         return recordDate <= end;
       }
 
-      return true
+      return true;
 
     })
-    setFilteredRecords(filtered)
+    setFilteredRecords(filtered);
+    console.log({ startDate, endDate, start, end, records, filtered });
   }
 
 
