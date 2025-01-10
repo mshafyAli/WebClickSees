@@ -159,12 +159,12 @@ const APW = () => {
     }
 
     const filtered = records.filter((record) => {
-      const recordDate = new Date(record.date);
-      const start = startDate ? new Date(startDate) : null;
-      const end = endDate ? new Date(endDate) : null;
-
+      const recordDate = new Date(record.date).toISOString().split("T")[0]; // Get only the date part (YYYY-MM-DD)
+      const start = startDate ? new Date(startDate).toISOString().split("T")[0] : null;
+      const end = endDate ? new Date(endDate).toISOString().split("T")[0] : null;
+  
       if (start && end) {
-        return recordDate >= start && recordDate <= end;
+        return recordDate >= start && recordDate <= end; // Inclusive of both start and end dates
       } else if (start) {
         return recordDate >= start;
       } else if (end) {
@@ -205,7 +205,7 @@ const APW = () => {
     <div className="mt-12">
       {/* Filter Controls */}
       <div className="max-w-4xl mx-auto mb-4">
-        <div className="flex items-center justify-center space-x-4">
+        <div className="flex md:flex-row flex-col items-center justify-center md:space-x-4">
           <div>
             <label className=" mb-2">Start Date:</label>
             <input
@@ -261,7 +261,7 @@ const APW = () => {
               return (
                 <TableRow key={record._id}>
                   <TableCell className="font-medium">{record.domain}</TableCell>
-                  <TableCell>{record.gclid || "N/A"}</TableCell>
+                  <TableCell className="max-w-[200px] overflow-auto break-words  whitespace-nowrap">{record.gclid || "N/A"}</TableCell>
                   <TableCell>{record.ip}</TableCell>
                   <TableCell className="text-left">{record.country}</TableCell>
                   <TableCell className="text-left">

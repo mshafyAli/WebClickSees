@@ -101,81 +101,80 @@
 // module.exports = router;
 
 
-
-// 4th new code for tracking this code is working fine nut not show isvpn true always show false
-
+//5th code for checking vpn this code is working fine but ipstack provide 100 request 
 // const express = require("express");
 // const axios = require("axios");
 // const router = express.Router();
+// const requestIp = require("request-ip");
 // const Tracking = require("../models/Tracking");
 // const GEOLOCATION_API_KEY = "6db4032c0324747c5d643eb5a15d5181"; // Replace with your valid API key
 // const GEOLOCATION_URL = "http://api.ipstack.com";
+// const VPN_API_KEY = "5648s6-c8489j-4s6hge-o40023"; 
+// const VPN_CHECK_URL = "https://proxycheck.io/v2";
 
-// // Helper function to extract the actual client IP
-// function getClientIP(req) {
-//   const xForwardedFor = req.headers["x-forwarded-for"];
-//   if (xForwardedFor) {
-//     console.log("x-forwarded-for header:", xForwardedFor); // Log the x-forwarded-for header
-//     return xForwardedFor.split(",")[0].trim(); // Return the first IP in the list
+// // Helper function to check if the IP is a VPN
+// async function checkVpn(ip) {
+//   try {
+//     const vpnResponse = await axios.get(`${VPN_CHECK_URL}/${ip}`, {
+//       params: { key: VPN_API_KEY, vpn: 1, asn: 1 },
+//     });
+//     const vpnData = vpnResponse.data[ip];
+//     console.log("VPN Check Data:", vpnData); // Log the VPN check data
+//     return vpnData && vpnData.proxy === "yes";
+//   } catch (error) {
+//     console.error("Error checking VPN:", error.message);
+//     return false;
 //   }
-//   console.log("Fallback IP (remoteAddress):", req.connection.remoteAddress); // Log fallback IP
-//   return req.connection.remoteAddress || "unknown"; // Fallback to remoteAddress
 // }
 
-// // Automatically track and save user information
+// // VPN check API endpoint
+// router.get("/api/check-vpn", async (req, res) => {
+//   try {
+//     const ip = req.query.ip;
+//     if (!ip) {
+//       return res.status(400).json({ error: "IP address is required" });
+//     }
+
+//     const isVpn = await checkVpn(ip);
+//     res.status(200).json({ ip, isVpn });
+//   } catch (error) {
+//     console.error("Error in VPN check API:", error.message);
+//     res.status(500).json({ error: "Internal server error" });
+//   }
+// });
+
+// // Existing tracking API
 // router.get("/api/track", async (req, res) => {
 //   try {
-//     // Extract actual client IP
-//     const ip = getClientIP(req);
-//     console.log("Extracted IP:", ip); // Log the extracted IP
+//     const ip = req.query.ip || requestIp.getClientIp(req);
+//     console.log("IP to track:", ip);
 
-//     // Extract domain and GCLID
-//     const domain = req.query.domain || req.hostname; // Extract domain from query or hostname
-//     const gclid = req.query.gclid || null; // GCLID from query parameters
+//     const domain = req.query.domain || req.hostname;
+//     const gclid = req.query.gclid || null;
 
-//     console.log("Domain:", domain); // Log the domain
-//     console.log("GCLID:", gclid); // Log the GCLID
+    
+    
 
-//     if (!ip || ip === "unknown" || !domain) {
-//       console.error("Error: Missing required fields: IP or domain");
-//       return res
-//         .status(400)
-//         .json({ error: "Missing required fields: IP or domain" });
-//     }
-
-//     // Check if IP already exists
-//     const existingRecord = await Tracking.findOne({ ip });
-
-//     if (existingRecord) {
-//       return res.status(409).json({ message: "IP already tracked", existingRecord });
-//     }
-
-//     // Fetch geolocation data for the IP
 //     const geoResponse = await axios.get(`${GEOLOCATION_URL}/${ip}`, {
 //       params: { access_key: GEOLOCATION_API_KEY },
 //     });
 //     const geoData = geoResponse.data;
-//     console.log("Geolocation Data:", geoData); // Log geolocation data
+//     console.log("Geolocation Data:", geoData);
 
-//     // Check if VPN detection is available and set it correctly
-//     const isVpn = geoData.security && geoData.security.vpn ? geoData.security.vpn : false;
+//     const isVpn = await checkVpn(ip); // Use the new VPN check function
 
-//     // Save tracking data to the database
 //     const trackingData = new Tracking({
 //       domain,
 //       gclid,
 //       ip,
 //       country: geoData.country_name || "Unknown",
-//       isVpn: isVpn,
+//       isVpn,
 //     });
 
 //     await trackingData.save();
-//     console.log("Tracking Data Saved:", trackingData); // Log the saved data
-
-//     // Respond to the request
-//     res.status(201).send("// Tracking information logged successfully.");
+//     res.status(201).json({ message: "Tracking information logged successfully", trackingData });
 //   } catch (error) {
-//     console.error("Error tracking user data:", error.message); // Log the error message
+//     console.error("Error tracking user data:", error.message);
 //     res.status(500).json({ error: "Internal server error" });
 //   }
 // });
@@ -183,6 +182,12 @@
 // // Fetch tracking records
 // router.get("/api/tracking-records", async (req, res) => {
 //   try {
+
+//     const sevenDaysAgo = new Date();
+//     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+//     await Tracking.deleteMany({ date: { $lt: sevenDaysAgo } });
+
 //     const records = await Tracking.find();
 //     res.status(200).json(records);
 //   } catch (error) {
@@ -194,8 +199,8 @@
 
 // router.delete("/api/tracking-records/:id", async (req, res) => {
 //   const { id } = req.params;
-//   const deletedRecord = await Tracking.findByIdAndDelete(id);
 //   try {
+//     const deletedRecord = await Tracking.findByIdAndDelete(id);
 //     if (!deletedRecord) {
 //       return res.status(404).json({ error: "Record not found" });
 //     }
@@ -208,33 +213,32 @@
 
 // module.exports = router;
 
-//5th code for checking vpn this code is working fine 
-
 
 const express = require("express");
 const axios = require("axios");
-const router = express.Router();
 const requestIp = require("request-ip");
 const Tracking = require("../models/Tracking");
-const GEOLOCATION_API_KEY = "6db4032c0324747c5d643eb5a15d5181"; // Replace with your valid API key
-const GEOLOCATION_URL = "http://api.ipstack.com";
-const VPN_API_KEY = "5648s6-c8489j-4s6hge-o40023"; // Replace with your ProxyCheck.io API key
-const VPN_CHECK_URL = "https://proxycheck.io/v2";
+const router = express.Router();
+
+const GEOLOCATION_URL = "http://ip-api.com/json"; 
+const VPN_API_KEY = "5648s6-c8489j-4s6hge-o40023"; // Change this to your chosen VPN checking API key
+const VPN_CHECK_URL = "https://proxycheck.io/v2"; // Example VPN check API URL
+
 
 // Helper function to check if the IP is a VPN
 async function checkVpn(ip) {
-  try {
-    const vpnResponse = await axios.get(`${VPN_CHECK_URL}/${ip}`, {
-      params: { key: VPN_API_KEY, vpn: 1, asn: 1 },
-    });
-    const vpnData = vpnResponse.data[ip];
-    console.log("VPN Check Data:", vpnData); // Log the VPN check data
-    return vpnData && vpnData.proxy === "yes";
-  } catch (error) {
-    console.error("Error checking VPN:", error.message);
-    return false;
+    try {
+      const vpnResponse = await axios.get(`${VPN_CHECK_URL}/${ip}`, {
+        params: { key: VPN_API_KEY, vpn: 1, asn: 1 },
+      });
+      const vpnData = vpnResponse.data[ip];
+      console.log("VPN Check Data:", vpnData); // Log the VPN check data
+      return vpnData && vpnData.proxy === "yes";
+    } catch (error) {
+      console.error("Error checking VPN:", error.message);
+      return false;
+    }
   }
-}
 
 // VPN check API endpoint
 router.get("/api/check-vpn", async (req, res) => {
@@ -261,12 +265,8 @@ router.get("/api/track", async (req, res) => {
     const domain = req.query.domain || req.hostname;
     const gclid = req.query.gclid || null;
 
-    
-    
-
-    const geoResponse = await axios.get(`${GEOLOCATION_URL}/${ip}`, {
-      params: { access_key: GEOLOCATION_API_KEY },
-    });
+    // Geolocation request using ip-api
+    const geoResponse = await axios.get(`${GEOLOCATION_URL}/${ip}`);
     const geoData = geoResponse.data;
     console.log("Geolocation Data:", geoData);
 
@@ -276,7 +276,7 @@ router.get("/api/track", async (req, res) => {
       domain,
       gclid,
       ip,
-      country: geoData.country_name || "Unknown",
+      country: geoData.country || "Unknown", // Using ip-api response country
       isVpn,
     });
 
@@ -291,7 +291,6 @@ router.get("/api/track", async (req, res) => {
 // Fetch tracking records
 router.get("/api/tracking-records", async (req, res) => {
   try {
-
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
@@ -305,7 +304,7 @@ router.get("/api/tracking-records", async (req, res) => {
   }
 });
 
-
+// Delete a specific tracking record
 router.delete("/api/tracking-records/:id", async (req, res) => {
   const { id } = req.params;
   try {
@@ -319,7 +318,5 @@ router.delete("/api/tracking-records/:id", async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
-
-
 
 module.exports = router;
