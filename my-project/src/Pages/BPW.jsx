@@ -8,12 +8,16 @@ import {
   TableHeader,
   TableCaption,
 } from "@/Components/ui/table";
+import { Link } from "react-router-dom";
+import { Button } from "@/Components/ui/button";
+import { LogOut, MoveLeft } from "lucide-react";
 
 const APW = () => {
   const [records, setRecords] = useState([]);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [filteredRecords, setFilteredRecords] = useState([]);
+  const [showGclidOnly, setShowGclidOnly] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -23,7 +27,11 @@ const APW = () => {
           "https://webclicksees.onrender.com/api/tracking-records"
         );
         const data = await response.json();
-        const domainRecords = data.filter((record) => record.domain === "britishphdwriters.co.uk");
+        const domainRecords = data.filter(
+          (record) =>
+            record.domain === "britishphdwriters.co.uk" ||
+            record.domain === "www.britishphdwriters.co.uk"
+        );
         setRecords(domainRecords);
         setFilteredRecords(domainRecords);
         setLoading(false);
@@ -37,36 +45,38 @@ const APW = () => {
   }, []);
 
   const handleFilter = () => {
-    if(!startDate && !endDate){
-      setFilteredRecords(records);
-      return;
+    // if (!startDate && !endDate) {
+    //   setFilteredRecords(records);
+    //   return;
+    // }
+
+    let filtered = records;
+
+    if (startDate || endDate) {
+      const start = startDate
+        ? new Date(startDate + "T00:00:00").getTime()
+        : null;
+      const end = endDate ? new Date(endDate + "T23:59:59").getTime() : null;
+
+      filtered = filtered.filter((record) => {
+        const recordDate = new Date(record.date).getTime();
+        if (start && end) return recordDate >= start && recordDate <= end;
+        if (start) return recordDate >= start;
+        if (end) return recordDate <= end;
+        return true;
+      });
     }
-    
-    const start = startDate ? new Date(startDate + 'T00:00:00').getTime() : null;
-    const end = endDate ? new Date(endDate + 'T23:59:59').getTime() : null;
 
-    const filtered = records.filter((record)=>{
-      const recordDate = new Date(record.date).getTime();
-     
-      
-      if(start && end){
-        return recordDate >= start && recordDate <= end;
-      }
-      if(start){
-        return recordDate >= start;
-      }
-      if(end){
-        return recordDate <= end;
-      }
+    if (showGclidOnly) {
+      filtered = filtered.filter((record) => record.gclid);
+    }
 
-      return true;
-
-    })
     setFilteredRecords(filtered);
-    console.log({ startDate, endDate, start, end, records, filtered });
-  }
+  };
 
-
+  const toggleGclidFilter = () => {
+    setShowGclidOnly(!showGclidOnly);
+  };
 
   const handleDelete = async (id) => {
     const confirmDelete = window.confirm("Are you sure you want to delete?");
@@ -79,7 +89,7 @@ const APW = () => {
           }
         );
         if (response.ok) {
-          const updatedRecords =records.filter((record)=>record._id !== id);
+          const updatedRecords = records.filter((record) => record._id !== id);
           setRecords(updatedRecords);
           setFilteredRecords(updatedRecords);
         }
@@ -89,12 +99,37 @@ const APW = () => {
     }
   };
 
+  useEffect(() => {
+    handleFilter(); // Apply filters whenever filters change
+  }, [startDate, endDate, showGclidOnly]);
+
   if (loading) {
     return <p>Loading tracking data...</p>;
   }
 
   return (
     <div className="mt-12">
+      <div className="flex items-start justify-around">
+        <Link to={"/home"}>
+          <Button className="py-2 text-white bg-blue-500 rounded hover:bg-blue-600">
+            <MoveLeft size={20} /> Back
+          </Button>
+        </Link>
+
+        <h1 className="text-center text-4xl font-bold pb-6">
+          British PhD Writer
+        </h1>
+
+        <div>
+          <Link to={"/login"}>
+            <Button className="py-2 text-white bg-blue-500 rounded hover:bg-blue-600">
+              <LogOut size={20} strokeWidth={2.25} />
+              LogOut
+            </Button>
+          </Link>
+        </div>
+      </div>
+
       <div className="max-w-4xl mx-auto mb-4">
         <div className="flex md:flex-row flex-col items-center justify-center md:space-x-4">
           <div>
@@ -115,11 +150,12 @@ const APW = () => {
               className=" w-full px-3 py-2 border rounded"
             />
           </div>
+          
           <button
-            onClick={handleFilter}
+            onClick={toggleGclidFilter}
             className="px-4 py-2 mt-6 text-white bg-blue-500 rounded hover:bg-blue-600"
           >
-            Apply Filter
+            {showGclidOnly ? "Show All" : "Paid Click"}
           </button>
         </div>
       </div>
