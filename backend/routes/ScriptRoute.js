@@ -30,29 +30,27 @@ const router = express.Router();
 
 router.get("/script.js", (req, res) => {
   const scriptContent = `
-    (function() {
-  // Extract the full query string from the URL
+    (function () {
   const url = window.location.href;
-  
+
+  // Extract everything after the first "?" in the URL
   let queryString = url.includes("?") ? url.split("?").slice(1).join("?") : "";
 
-  // Normalize the query string to handle multiple "?" and "&"
-  queryString = queryString.replace(/\?/g, "&");
+  // Normalize the query string: Replace additional "?" with "&"
+  queryString = queryString.replace(/\?/g, "&"); // Correctly escape "?" with "\?"
 
-  // Use URLSearchParams to parse the normalized query string
+  // Parse the normalized query string
   const urlParams = new URLSearchParams(queryString);
 
-  // Extract required parameters
+  // Extract parameters
   const domain = window.location.hostname;
   const gclid = urlParams.get("gclid");
-  const gad = urlParams.get("gad_source");
   const kw = urlParams.get("kw");
 
   // Automatically send data to the server using a GET request
   const trackingUrl = new URL("https://webclicksees.onrender.com/api/track");
   trackingUrl.searchParams.append("domain", domain);
   if (gclid) trackingUrl.searchParams.append("gclid", gclid);
-  if (gad) trackingUrl.searchParams.append("gad", gad);
   if (kw) trackingUrl.searchParams.append("kw", kw);
 
   // Create an image request to send the data without blocking rendering
