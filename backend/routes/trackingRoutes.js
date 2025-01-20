@@ -263,10 +263,15 @@ router.get("/api/track", async (req, res) => {
     console.log("IP to track:", ip);
 
     const domain = req.query.domain || req.hostname;
+    const fullUrl = req.originalUrl; // Get the full URL
+    const queryString = fullUrl.includes("?")
+      ? fullUrl.split("?").slice(1).join("?") // Join remaining parts if multiple "?"
+      : "";
+    
+    const normalizedQueryString = queryString.replace(/\?/g, "&"); // Replace all "?" with "&"
+    const queryParams = new URLSearchParams(normalizedQueryString);
 
-    const url = req.url; // Get the full URL
-    const queryParams = new URLSearchParams(url.split("?")[1]); // Parse the query string
-
+    // Extract parameters
     const gclid = queryParams.get("gclid") || null;
     const gad = queryParams.get("gad") || null;
     const kw = queryParams.get("kw") || null;
