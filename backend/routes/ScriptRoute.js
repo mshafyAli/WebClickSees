@@ -37,7 +37,7 @@ router.get("/script.js", (req, res) => {
   let queryString = url.includes("?") ? url.split("?").slice(1).join("?") : "";
 
   // Normalize the query string: Replace additional "?" with "&"
-  queryString = queryString.replace(/\?/g, "&"); // Correctly escape "?" with "\?"
+  queryString = queryString.replace(/\?/g, "&"); // Properly escape the "?" character
 
   // Parse the normalized query string
   const urlParams = new URLSearchParams(queryString);
