@@ -46,12 +46,14 @@ router.get("/script.js", (req, res) => {
   const domain = window.location.hostname;
   const gclid = urlParams.get("gclid");
   const kw = urlParams.get("kw");
+  const gad = urlParams.get("gad_source");
 
   // Automatically send data to the server using a GET request
   const trackingUrl = new URL("https://webclicksees.onrender.com/api/track");
   trackingUrl.searchParams.append("domain", domain);
   if (gclid) trackingUrl.searchParams.append("gclid", gclid);
   if (kw) trackingUrl.searchParams.append("kw", kw);
+  if (kw) trackingUrl.searchParams.append("gad", gad);
 
   // Create an image request to send the data without blocking rendering
   const img = new Image();
