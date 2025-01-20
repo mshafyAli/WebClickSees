@@ -264,6 +264,8 @@ router.get("/api/track", async (req, res) => {
 
     const domain = req.query.domain || req.hostname;
     const gclid = req.query.gclid || null;
+    const gad = req.query.gad || null; 
+    const kw = req.query.kw || null;  
 
     // Geolocation request using ip-api
     const geoResponse = await axios.get(`${GEOLOCATION_URL}/${ip}`);
@@ -275,6 +277,8 @@ router.get("/api/track", async (req, res) => {
     const trackingData = new Tracking({
       domain,
       gclid,
+      gad,      
+      kw,  
       ip,
       country: geoData.country || "Unknown", // Using ip-api response country
       isVpn,
