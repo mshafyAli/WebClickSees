@@ -168,6 +168,7 @@ const APW = () => {
             <TableHead>Ip</TableHead>
             <TableHead className="text-left">Country</TableHead>
             <TableHead className="text-left">VPN</TableHead>
+            <TableHead className="text-left">KW</TableHead>
             <TableHead className="text-left">Date & Time</TableHead>
             <TableHead className="text-left">Delete</TableHead>
           </TableRow>
@@ -194,6 +195,7 @@ const APW = () => {
                   <TableCell className="text-left">
                     {record.isVpn ? "Yes" : "No"}
                   </TableCell>
+                  <TableCell>{record.kw}</TableCell>
                   <TableCell>{formattedDateTime}</TableCell>
 
                   <TableCell className="text-left">
