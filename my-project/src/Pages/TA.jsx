@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Table,
   TableHead,
@@ -8,12 +8,16 @@ import {
   TableHeader,
   TableCaption,
 } from "@/Components/ui/table";
+import { Link } from "react-router-dom";
+import { Button } from "@/Components/ui/button";
+import { LogOut, MoveLeft } from "lucide-react";
 
-const TrackingTable = () => {
+const APW = () => {
   const [records, setRecords] = useState([]);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [filteredRecords, setFilteredRecords] = useState([]);
+  const [showGclidOnly, setShowGclidOnly] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -23,7 +27,11 @@ const TrackingTable = () => {
           "https://webclicksees.onrender.com/api/tracking-records"
         );
         const data = await response.json();
-        const domainRecords = data.filter((record)=> record.domain === "the-academians.com");
+        const domainRecords = data.filter(
+          (record) =>
+            record.domain === "the-academians.uk" ||
+            record.domain === "www.the-academians.uk"
+        );
         setRecords(domainRecords);
         setFilteredRecords(domainRecords);
         setLoading(false);
@@ -36,36 +44,38 @@ const TrackingTable = () => {
     fetchTrackingData();
   }, []);
 
-
   const handleFilter = () => {
-    // Validate inputs
-    if (!startDate && !endDate) {
-      setFilteredRecords(records);
-      return;
+    // if (!startDate && !endDate) {
+    //   setFilteredRecords(records);
+    //   return;
+    // }
+
+    let filtered = records;
+
+    if (startDate || endDate) {
+      const start = startDate
+        ? new Date(startDate + "T00:00:00").getTime()
+        : null;
+      const end = endDate ? new Date(endDate + "T23:59:59").getTime() : null;
+
+      filtered = filtered.filter((record) => {
+        const recordDate = new Date(record.date).getTime();
+        if (start && end) return recordDate >= start && recordDate <= end;
+        if (start) return recordDate >= start;
+        if (end) return recordDate <= end;
+        return true;
+      });
     }
-  
-    // Convert input dates to comparable timestamps
-    const start = startDate ? new Date(startDate + 'T00:00:00').getTime() : null;
-    const end = endDate ? new Date(endDate + 'T23:59:59').getTime() : null;
-  
-    // Filter records
-    const filtered = records.filter((record) => {
-      const recordDate = new Date(record.date).getTime(); // Convert record.date to timestamp
-      if (start && end) {
-        return recordDate >= start && recordDate <= end;
-      }
-      if (start) {
-        return recordDate >= start;
-      }
-      if (end) {
-        return recordDate <= end;
-      }
-      return true; // Shouldn't reach here, but ensures no records are skipped
-    });
-  
-    // Update state
+
+    if (showGclidOnly) {
+      filtered = filtered.filter((record) => record.gclid);
+    }
+
     setFilteredRecords(filtered);
-  
+  };
+
+  const toggleGclidFilter = () => {
+    setShowGclidOnly(!showGclidOnly);
   };
 
   const handleDelete = async (id) => {
@@ -89,14 +99,39 @@ const TrackingTable = () => {
     }
   };
 
+  useEffect(() => {
+    handleFilter(); // Apply filters whenever filters change
+  }, [startDate, endDate, showGclidOnly]);
+
   if (loading) {
     return <p>Loading tracking data...</p>;
   }
 
   return (
     <div className="mt-12">
-      <div className="md:max-w-4xl mx-auto mb-4">
-        <div className="flex flex-col md:flex-row items-center justify-center md:space-x-4 ">
+      <div className="flex items-start justify-around">
+        <Link to={"/home"}>
+          <Button className="py-2 text-white bg-blue-500 rounded hover:bg-blue-600">
+            <MoveLeft size={20} /> Back
+          </Button>
+        </Link>
+
+        <h1 className="text-center text-4xl font-bold pb-6">
+        The-academians.uk(TA)
+        </h1>
+
+        <div>
+          <Link to={"/login"}>
+            <Button className="py-2 text-white bg-blue-500 rounded hover:bg-blue-600">
+              <LogOut size={20} strokeWidth={2.25} />
+              LogOut
+            </Button>
+          </Link>
+        </div>
+      </div>
+
+      <div className="max-w-4xl mx-auto mb-4">
+        <div className="flex md:flex-row flex-col items-center justify-center md:space-x-4">
           <div>
             <label className=" mb-2">Start Date:</label>
             <input
@@ -115,15 +150,15 @@ const TrackingTable = () => {
               className=" w-full px-3 py-2 border rounded"
             />
           </div>
+          
           <button
-            onClick={handleFilter}
+            onClick={toggleGclidFilter}
             className="px-4 py-2 mt-6 text-white bg-blue-500 rounded hover:bg-blue-600"
           >
-            Apply Filter
+            {showGclidOnly ? "Show All" : "Paid Click"}
           </button>
         </div>
       </div>
-
       <Table className="max-w-4xl mx-auto">
         <TableCaption>A list of your recent Tracking.</TableCaption>
         <TableHeader>
@@ -133,6 +168,8 @@ const TrackingTable = () => {
             <TableHead>Ip</TableHead>
             <TableHead className="text-left">Country</TableHead>
             <TableHead className="text-left">VPN</TableHead>
+            <TableHead className="text-left">KW</TableHead>
+            <TableHead className="text-left">GAD</TableHead>
             <TableHead className="text-left">Date & Time</TableHead>
             <TableHead className="text-left">Delete</TableHead>
           </TableRow>
@@ -143,7 +180,7 @@ const TrackingTable = () => {
             .slice()
             .reverse()
             .map((record) => {
-              // Format the date in 'MM/DD/YYYY' format (or use a format that suits you)
+              // Format the date and time using 'toLocaleString'
               const formattedDateTime = record.date
                 ? new Date(record.date).toLocaleString() // Includes both date and time
                 : "N/A";
@@ -151,12 +188,16 @@ const TrackingTable = () => {
               return (
                 <TableRow key={record._id}>
                   <TableCell className="font-medium">{record.domain}</TableCell>
-                  <TableCell className="max-w-[200px] overflow-auto whitespace-nowrap break-words">{record.gclid || "N/A"}</TableCell>
+                  <TableCell className="max-w-[150px] overflow-auto break-words whitespace-nowrap">
+                    {record.gclid || "N/A"}
+                  </TableCell>
                   <TableCell>{record.ip}</TableCell>
                   <TableCell className="text-left">{record.country}</TableCell>
                   <TableCell className="text-left">
                     {record.isVpn ? "Yes" : "No"}
                   </TableCell>
+                  <TableCell>{record.kw || "N/A"}</TableCell>
+                  <TableCell>{record.gad || "N/A"}</TableCell>
                   <TableCell>{formattedDateTime}</TableCell>
 
                   <TableCell className="text-left">
@@ -176,6 +217,4 @@ const TrackingTable = () => {
   );
 };
 
-export default TrackingTable;
-
-
+export default APW;

@@ -1,6 +1,3 @@
-
-
-
 // import { useEffect, useState } from "react";
 // import {
 //   Table,
@@ -189,8 +186,6 @@
 
 // export default APW;
 
-
-
 import { useEffect, useState } from "react";
 import {
   Table,
@@ -202,7 +197,7 @@ import {
   TableCaption,
 } from "@/Components/ui/table";
 import { Button } from "@/Components/ui/button";
-import {  LogOut, MoveLeft } from "lucide-react";
+import { LogOut, MoveLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const APW = () => {
@@ -221,7 +216,9 @@ const APW = () => {
         );
         const data = await response.json();
         const domainRecords = data.filter(
-          (record) => record.domain === "aussiephdwriters.com.au" || record.domain === "www.aussiephdwriters.com.au"
+          (record) =>
+            record.domain === "aussiephdwriters.com.au" ||
+            record.domain === "www.aussiephdwriters.com.au"
         );
         setRecords(domainRecords);
         setFilteredRecords(domainRecords);
@@ -240,7 +237,9 @@ const APW = () => {
 
     // Apply date filters
     if (startDate || endDate) {
-      const start = startDate ? new Date(startDate + "T00:00:00").getTime() : null;
+      const start = startDate
+        ? new Date(startDate + "T00:00:00").getTime()
+        : null;
       const end = endDate ? new Date(endDate + "T23:59:59").getTime() : null;
 
       filtered = filtered.filter((record) => {
@@ -296,25 +295,24 @@ const APW = () => {
   return (
     <div className="mt-12">
       <div className="flex items-start justify-around">
-      
+        <Link to={"/home"}>
+          <Button className="py-2 text-white bg-blue-500 rounded hover:bg-blue-600">
+            <MoveLeft size={20} /> Back
+          </Button>
+        </Link>
 
-     <Link to={"/home"}>
-     <Button className="py-2 text-white bg-blue-500 rounded hover:bg-blue-600">
-     <MoveLeft size={20} /> Back
-    </Button>
-     </Link>
+        <h1 className="text-center text-4xl font-bold pb-6">
+          Aussie PhD Writer
+        </h1>
 
-     <h1 className="text-center text-4xl font-bold pb-6">Aussie PhD Writer</h1>
-
-     <div>
-     <Link to={"/login"}>
-     <Button className="py-2 text-white bg-blue-500 rounded hover:bg-blue-600">
-     <LogOut size={20} strokeWidth={2.25} />LogOut
-    </Button>
-     </Link>
-     </div>
-     
-
+        <div>
+          <Link to={"/login"}>
+            <Button className="py-2 text-white bg-blue-500 rounded hover:bg-blue-600">
+              <LogOut size={20} strokeWidth={2.25} />
+              LogOut
+            </Button>
+          </Link>
+        </div>
       </div>
 
       <div className="max-w-4xl mx-auto mb-4">
@@ -355,6 +353,8 @@ const APW = () => {
             <TableHead>Ip</TableHead>
             <TableHead className="text-left">Country</TableHead>
             <TableHead className="text-left">VPN</TableHead>
+            <TableHead className="text-left">KW</TableHead>
+            <TableHead className="text-left">GAD</TableHead>
             <TableHead className="text-left">Date & Time</TableHead>
             <TableHead className="text-left">Delete</TableHead>
           </TableRow>
@@ -379,6 +379,8 @@ const APW = () => {
                   <TableCell className="text-left">
                     {record.isVpn ? "Yes" : "No"}
                   </TableCell>
+                  <TableCell>{record.kw || "N/A"}</TableCell>
+                  <TableCell>{record.gad || "N/A"}</TableCell>
                   <TableCell>{formattedDateTime}</TableCell>
                   <TableCell className="text-left">
                     <button

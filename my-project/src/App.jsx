@@ -1,9 +1,11 @@
 import { Routes, Route } from "react-router-dom";
 import Home from "./Pages/Home";
-import AcdemiansComAu from "./Pages/AcdemiansComAu";
-import TheAcademiansCom from "./Pages/TheAcademiansCom";
+import AcdemiansComUk from "./Pages/AcdemiansCoUk";
+import TheAcdemiansCoUk from "./Pages/TheAcdemiansCoUk";
 import APW from "./Pages/APW";
 import BPW from "./Pages/BPW";
+import THA from "./Pages/THA";
+import TA from "./Pages/TA";
 import { ToastContainer } from "react-toastify";
 import Login from "./Components/Login";
 function App() {
@@ -12,10 +14,12 @@ function App() {
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/home" element={<Home />} />
-        <Route path="/academians.com.au" element={<AcdemiansComAu />} />
-        <Route path="/the-academians.com" element={<TheAcademiansCom />} />
+        <Route path="/academians.co.uk" element={<AcdemiansComUk />} />
+        <Route path="/the-academians.co.uk" element={<TheAcdemiansCoUk />} />
         <Route path="/aussiephdwriter.com.au" element={<APW />} />
         <Route path="/britishphdwriters.co.uk" element={<BPW />} />
+        <Route path="/the-academians.au" element={<THA />} />
+        <Route path="/the-academians.uk" element={<TA />} />
       <Route path="/login" element={<Login />} />
 
        

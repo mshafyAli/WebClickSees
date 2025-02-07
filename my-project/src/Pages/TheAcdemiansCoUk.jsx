@@ -29,8 +29,8 @@ const APW = () => {
         const data = await response.json();
         const domainRecords = data.filter(
           (record) =>
-            record.domain === "britishphdwriters.co.uk" ||
-            record.domain === "www.britishphdwriters.co.uk"
+            record.domain === "the-academians.co.uk" ||
+            record.domain === "www.the-academians.co.uk"
         );
         setRecords(domainRecords);
         setFilteredRecords(domainRecords);
@@ -117,7 +117,7 @@ const APW = () => {
         </Link>
 
         <h1 className="text-center text-4xl font-bold pb-6">
-          British PhD Writer
+          The-Academians.Co.Uk
         </h1>
 
         <div>
@@ -150,7 +150,7 @@ const APW = () => {
               className=" w-full px-3 py-2 border rounded"
             />
           </div>
-          
+
           <button
             onClick={toggleGclidFilter}
             className="px-4 py-2 mt-6 text-white bg-blue-500 rounded hover:bg-blue-600"

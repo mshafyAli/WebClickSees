@@ -29,8 +29,8 @@ const APW = () => {
         const data = await response.json();
         const domainRecords = data.filter(
           (record) =>
-            record.domain === "britishphdwriters.co.uk" ||
-            record.domain === "www.britishphdwriters.co.uk"
+            record.domain === "the-academians.au" ||
+            record.domain === "www.the-academians.au"
         );
         setRecords(domainRecords);
         setFilteredRecords(domainRecords);
@@ -117,7 +117,7 @@ const APW = () => {
         </Link>
 
         <h1 className="text-center text-4xl font-bold pb-6">
-          British PhD Writer
+        The-academians.au(THA)
         </h1>
 
         <div>
