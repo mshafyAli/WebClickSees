@@ -176,42 +176,80 @@ const APW = () => {
         </TableHeader>
 
         <TableBody>
-          {filteredRecords
-            .slice()
-            .reverse()
-            .map((record) => {
-              // Format the date and time using 'toLocaleString'
-              const formattedDateTime = record.date
-                ? new Date(record.date).toLocaleString() // Includes both date and time
-                : "N/A";
+  {(() => {
+    const gclidCounts = {}; 
+    const ipCounts = {}; 
+    const uniqueRecords = [];
 
-              return (
-                <TableRow key={record._id}>
-                  <TableCell className="font-medium">{record.domain}</TableCell>
-                  <TableCell className="max-w-[150px] overflow-auto break-words whitespace-nowrap">
-                    {record.gclid || "N/A"}
-                  </TableCell>
-                  <TableCell>{record.ip}</TableCell>
-                  <TableCell className="text-left">{record.country}</TableCell>
-                  <TableCell className="text-left">
-                    {record.isVpn ? "Yes" : "No"}
-                  </TableCell>
-                  <TableCell>{record.kw || "N/A"}</TableCell>
-                  <TableCell>{record.gad || "N/A"}</TableCell>
-                  <TableCell>{formattedDateTime}</TableCell>
+    filteredRecords
+      .slice()
+      .reverse()
+      .forEach((record) => {
+        if (record.gclid) {
+          if (!gclidCounts[record.gclid]) {
+            gclidCounts[record.gclid] = { ...record, gclidCount: 1 };
+            uniqueRecords.push(gclidCounts[record.gclid]);
+          } else {
+            gclidCounts[record.gclid].gclidCount += 1;
+          }
+        } else if (record.ip) {
+          if (!ipCounts[record.ip]) {
+            ipCounts[record.ip] = { ...record, visitCount: 1 };
+            uniqueRecords.push(ipCounts[record.ip]);
+          } else {
+            ipCounts[record.ip].visitCount += 1;
+          }
+        }
+      });
 
-                  <TableCell className="text-left">
-                    <button
-                      className="px-4 py-2 text-white bg-red-500 rounded hover:bg-red-600"
-                      onClick={() => handleDelete(record._id)}
-                    >
-                      Delete
-                    </button>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-        </TableBody>
+    return uniqueRecords.map((record) => {
+      const formattedDateTime = record.date
+        ? new Date(record.date).toLocaleString()
+        : "N/A";
+
+      return (
+        <TableRow key={record._id}>
+          <TableCell className="font-medium">{record.domain}</TableCell>
+
+          <TableCell className="max-w-[150px] overflow-auto break-words whitespace-nowrap pt-10">
+            {record.gclid ? (
+              <div className="relative group inline-block">
+                <span className="cursor-pointer">{record.gclid}</span>
+                <div className="absolute   bottom-full mb-1  group-hover:block bg-gray-800 text-white text-xs py-1 px-2 rounded">
+                  Count: {record.gclidCount}
+                </div>
+              </div>
+            ) : "N/A"}
+          </TableCell>
+          <TableCell className="relative">
+            {record.ip ? (
+              <div className="relative group">
+                <span className="cursor-pointer">{record.ip}</span>
+                <div className="absolute   bottom-full mb-1  group-hover:block bg-gray-800 text-white text-xs py-1 px-2 rounded">
+                  visit: {record.visitCount || 1}
+                </div>
+              </div>
+            ) : "N/A"}
+          </TableCell>
+
+          <TableCell className="text-left">{record.country}</TableCell>
+          <TableCell className="text-left">{record.isVpn ? "Yes" : "No"}</TableCell>
+          <TableCell>{record.kw || "N/A"}</TableCell>
+          <TableCell>{record.gad || "N/A"}</TableCell>
+          <TableCell>{formattedDateTime}</TableCell>
+          <TableCell className="text-left">
+            <button
+              className="px-4 py-2 text-white bg-red-500 rounded hover:bg-red-600"
+              onClick={() => handleDelete(record._id)}
+            >
+              Delete
+            </button>
+          </TableCell>
+        </TableRow>
+      );
+    });
+  })()}
+</TableBody>
       </Table>
     </div>
   );
