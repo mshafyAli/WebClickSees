@@ -53,7 +53,7 @@ router.get("/script.js", (req, res) => {
   trackingUrl.searchParams.append("domain", domain);
   if (gclid) trackingUrl.searchParams.append("gclid", gclid);
   if (kw) trackingUrl.searchParams.append("kw", kw);
-  if (kw) trackingUrl.searchParams.append("gad", gad);
+  if (gad) trackingUrl.searchParams.append("gad", gad);
 
   // Create an image request to send the data without blocking rendering
   const img = new Image();
