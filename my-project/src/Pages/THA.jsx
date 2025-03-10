@@ -11,6 +11,7 @@ import {
 import { Link } from "react-router-dom";
 import { Button } from "@/Components/ui/button";
 import { LogOut, MoveLeft } from "lucide-react";
+import { useSelector } from "react-redux";
 
 const APW = () => {
   const [records, setRecords] = useState([]);
@@ -19,6 +20,9 @@ const APW = () => {
   const [filteredRecords, setFilteredRecords] = useState([]);
   const [showGclidOnly, setShowGclidOnly] = useState(false);
   const [loading, setLoading] = useState(true);
+
+  const { user } = useSelector((state) => state.auth);
+  const userRole = user?.role; // Extract user role
 
   useEffect(() => {
     const fetchTrackingData = async () => {
@@ -45,11 +49,6 @@ const APW = () => {
   }, []);
 
   const handleFilter = () => {
-    // if (!startDate && !endDate) {
-    //   setFilteredRecords(records);
-    //   return;
-    // }
-
     let filtered = records;
 
     if (startDate || endDate) {
@@ -68,7 +67,7 @@ const APW = () => {
     }
 
     if (showGclidOnly) {
-      filtered = filtered.filter((record) => record.gclid);
+      filtered = filtered.filter((record) => record.gclid || record.gad);
     }
 
     setFilteredRecords(filtered);
@@ -117,7 +116,7 @@ const APW = () => {
         </Link>
 
         <h1 className="text-center text-4xl font-bold pb-6">
-        The-academians.au(THA)
+          The-academians.au(THA)
         </h1>
 
         <div>
@@ -150,7 +149,7 @@ const APW = () => {
               className=" w-full px-3 py-2 border rounded"
             />
           </div>
-          
+
           <button
             onClick={toggleGclidFilter}
             className="px-4 py-2 mt-6 text-white bg-blue-500 rounded hover:bg-blue-600"
@@ -171,85 +170,122 @@ const APW = () => {
             <TableHead className="text-left">KW</TableHead>
             <TableHead className="text-left">GAD</TableHead>
             <TableHead className="text-left">Date & Time</TableHead>
-            <TableHead className="text-left">Delete</TableHead>
+            {userRole === "admin" && (
+              <TableHead className="text-left">Delete</TableHead>
+            )}
           </TableRow>
         </TableHeader>
 
         <TableBody>
-  {(() => {
-    const gclidCounts = {}; 
-    const ipCounts = {}; 
-    const uniqueRecords = [];
+          {(() => {
+            const ipRecords = {};
+            const uniqueRecords = [];
 
-    filteredRecords
-      .slice()
-      .reverse()
-      .forEach((record) => {
-        if (record.gclid) {
-          if (!gclidCounts[record.gclid]) {
-            gclidCounts[record.gclid] = { ...record, gclidCount: 1 };
-            uniqueRecords.push(gclidCounts[record.gclid]);
-          } else {
-            gclidCounts[record.gclid].gclidCount += 1;
-          }
-        } else if (record.ip) {
-          if (!ipCounts[record.ip]) {
-            ipCounts[record.ip] = { ...record, visitCount: 1 };
-            uniqueRecords.push(ipCounts[record.ip]);
-          } else {
-            ipCounts[record.ip].visitCount += 1;
-          }
-        }
-      });
+            filteredRecords
+              .slice()
+              .reverse()
+              .forEach((record) => {
+                if (record.ip) {
+                  if (!ipRecords[record.ip]) {
+                    ipRecords[record.ip] = {
+                      ...record,
+                      visitCount: 1,
+                      gclidList: record.gclid ? [record.gclid] : [],
+                    };
+                    uniqueRecords.push(ipRecords[record.ip]);
+                  } else {
+                    ipRecords[record.ip].visitCount += 1;
 
-    return uniqueRecords.map((record) => {
-      const formattedDateTime = record.date
-        ? new Date(record.date).toLocaleString()
-        : "N/A";
+                    if (record.gclid) {
+                      ipRecords[record.ip].gclidList.push(record.gclid);
+                    }
+                  }
+                }
+              });
 
-      return (
-        <TableRow key={record._id}>
-          <TableCell className="font-medium">{record.domain}</TableCell>
+            return uniqueRecords.map((record) => {
+              const formattedDateTime = record.date
+                ? new Date(record.date).toLocaleString()
+                : "N/A";
 
-          <TableCell className="max-w-[150px] overflow-auto break-words whitespace-nowrap pt-10">
-            {record.gclid ? (
-              <div className="relative group inline-block">
-                <span className="cursor-pointer">{record.gclid}</span>
-                <div className="absolute   bottom-full mb-1  group-hover:block bg-gray-800 text-white text-xs py-1 px-2 rounded">
-                  Count: {record.gclidCount}
-                </div>
-              </div>
-            ) : "N/A"}
-          </TableCell>
-          <TableCell className="relative">
-            {record.ip ? (
-              <div className="relative group">
-                <span className="cursor-pointer">{record.ip}</span>
-                <div className="absolute   bottom-full mb-1  group-hover:block bg-gray-800 text-white text-xs py-1 px-2 rounded">
-                  visit: {record.visitCount || 1}
-                </div>
-              </div>
-            ) : "N/A"}
-          </TableCell>
+              // Count unique and duplicate GCLIDs
+              const gclidCountMap = {};
+              record.gclidList.forEach((gclid) => {
+                gclidCountMap[gclid] = (gclidCountMap[gclid] || 0) + 1;
+              });
 
-          <TableCell className="text-left">{record.country}</TableCell>
-          <TableCell className="text-left">{record.isVpn ? "Yes" : "No"}</TableCell>
-          <TableCell>{record.kw || "N/A"}</TableCell>
-          <TableCell>{record.gad || "N/A"}</TableCell>
-          <TableCell>{formattedDateTime}</TableCell>
-          <TableCell className="text-left">
-            <button
-              className="px-4 py-2 text-white bg-red-500 rounded hover:bg-red-600"
-              onClick={() => handleDelete(record._id)}
-            >
-              Delete
-            </button>
-          </TableCell>
-        </TableRow>
-      );
-    });
-  })()}
-</TableBody>
+              const uniqueGclids = Object.keys(gclidCountMap).length;
+              const duplicateGclids = Object.values(gclidCountMap)
+                .filter((count) => count > 1) // Find values occurring more than once
+                .reduce((acc, count) => acc + (count - 1), 0); // Sum up extra occurrences
+              const totalGclids = record.gclidList.length;
+
+              return (
+                <TableRow key={record._id}>
+                  <TableCell className="font-medium">{record.domain}</TableCell>
+
+                  {/* GCLID Column with Tooltip */}
+                  <TableCell className="max-w-[150px] overflow-auto break-words whitespace-nowrap pt-12">
+                    {record.gclidList.length > 0 ? (
+                      <div className="relative group inline-block">
+                        <span className="cursor-pointer">
+                          {record.gclidList.join(", ")}
+                        </span>
+                        <div className="absolute bottom-full group-hover:block bg-gray-800 text-white text-xs py-1 px-2 rounded max-w-[200px]">
+                          <div>Total: {totalGclids}</div>
+                        </div>
+
+                        <div className="absolute bottom-full hidden group-hover:block bg-gray-800 text-white text-xs py-1 px-2 rounded max-w-[200px]">
+                          <div>Unique: {uniqueGclids}</div>
+                          <div>Duplicate: {duplicateGclids}</div>
+                        </div>
+                      </div>
+                    ) : (
+                      "N/A"
+                    )}
+                  </TableCell>
+
+                  <TableCell>
+                    {record.ip ? (
+                      <div className="relative group inline-block">
+                        <span className="cursor-pointer">{record.ip}</span>
+                        <div className="absolute bottom-full mb-1 group-hover:block bg-gray-800 text-white text-xs py-1 px-2 rounded whitespace-nowrap">
+                          <div>Total Visits: {record.visitCount}</div>
+                        </div>
+                        <div className="absolute hidden bottom-full mb-1 group-hover:block bg-gray-800 text-white text-xs py-1 px-2 rounded whitespace-nowrap">
+                          <div>With GCLID: {totalGclids}</div>
+                          <div>
+                            Without GCLID: {record.visitCount - totalGclids}
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      "N/A"
+                    )}
+                  </TableCell>
+
+                  <TableCell className="text-left">{record.country}</TableCell>
+                  <TableCell className="text-left">
+                    {record.isVpn ? "Yes" : "No"}
+                  </TableCell>
+                  <TableCell>{record.kw || "N/A"}</TableCell>
+                  <TableCell>{record.gad || "N/A"}</TableCell>
+                  <TableCell>{formattedDateTime}</TableCell>
+                  <TableCell className="text-left">
+                    {userRole === "admin" && (
+                      <button
+                        className="px-4 py-2 text-white bg-red-500 rounded hover:bg-red-600"
+                        onClick={() => handleDelete(record._id)}
+                      >
+                        Delete
+                      </button>
+                    )}
+                  </TableCell>
+                </TableRow>
+              );
+            });
+          })()}
+        </TableBody>
       </Table>
     </div>
   );

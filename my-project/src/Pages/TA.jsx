@@ -11,6 +11,7 @@ import {
 import { Link } from "react-router-dom";
 import { Button } from "@/Components/ui/button";
 import { LogOut, MoveLeft } from "lucide-react";
+import { useSelector } from "react-redux";
 
 const APW = () => {
   const [records, setRecords] = useState([]);
@@ -19,6 +20,9 @@ const APW = () => {
   const [filteredRecords, setFilteredRecords] = useState([]);
   const [showGclidOnly, setShowGclidOnly] = useState(false);
   const [loading, setLoading] = useState(true);
+
+  const { user } = useSelector((state) => state.auth);
+  const userRole = user?.role; // Extract user role
 
   useEffect(() => {
     const fetchTrackingData = async () => {
@@ -68,7 +72,7 @@ const APW = () => {
     }
 
     if (showGclidOnly) {
-      filtered = filtered.filter((record) => record.gclid);
+      filtered = filtered.filter((record) => record.gclid || record.gad);
     }
 
     setFilteredRecords(filtered);
@@ -201,7 +205,9 @@ const APW = () => {
             <TableHead className="text-left">KW</TableHead>
             <TableHead className="text-left">GAD</TableHead>
             <TableHead className="text-left">Date & Time</TableHead>
-            <TableHead className="text-left">Delete</TableHead>
+            {userRole === "admin" && (
+              <TableHead className="text-left">Delete</TableHead>
+            )}
           </TableRow>
         </TableHeader>
 
@@ -382,7 +388,6 @@ const APW = () => {
                 .reduce((acc, count) => acc + (count - 1), 0); // Sum up extra occurrences
               const totalGclids = record.gclidList.length;
 
-              
               return (
                 <TableRow key={record._id}>
                   <TableCell className="font-medium">{record.domain}</TableCell>
@@ -435,12 +440,14 @@ const APW = () => {
                   <TableCell>{record.gad || "N/A"}</TableCell>
                   <TableCell>{formattedDateTime}</TableCell>
                   <TableCell className="text-left">
-                    <button
-                      className="px-4 py-2 text-white bg-red-500 rounded hover:bg-red-600"
-                      onClick={() => handleDelete(record._id)}
-                    >
-                      Delete
-                    </button>
+                    {userRole === "admin" && (
+                      <button
+                        className="px-4 py-2 text-white bg-red-500 rounded hover:bg-red-600"
+                        onClick={() => handleDelete(record._id)}
+                      >
+                        Delete
+                      </button>
+                    )}
                   </TableCell>
                 </TableRow>
               );
