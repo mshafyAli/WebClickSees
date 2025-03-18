@@ -201,6 +201,7 @@ router.get("/api/check-vpn", async (req, res) => {
 router.get("/api/track", async (req, res) => {
   try {
     const ip = req.query.ip || requestIp.getClientIp(req);
+    console.log("IP to track:", ip);
     const domain = req.query.domain || req.hostname;
     const gclid = req.query.gclid || null;
     const gad = req.query.gad || null;
