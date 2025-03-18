@@ -211,6 +211,7 @@ router.get("/api/track", async (req, res) => {
     // Geolocation request using ipinfo.io
     const geoResponse = await axios.get(`${IPINFO_URL}/${ip}?token=${IPINFO_TOKEN}`);
     const geoData = geoResponse.data;
+    console.log("Geolocation Data:", geoData);
 
     const isVpn = await checkVpn(ip); // VPN check function
 
