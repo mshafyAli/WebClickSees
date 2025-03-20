@@ -199,6 +199,7 @@ router.get("/api/check-vpn", async (req, res) => {
 
 // Tracking API
 router.get("/api/track", async (req, res) => {
+  console.log("Tracking API HIT: Query params =>", req.query); // 🔥 LOG IMMEDIATELY
   try {
     const ip = req.query.ip || requestIp.getClientIp(req);
     console.log("IP to track:", ip);
