@@ -213,16 +213,16 @@ router.get("/api/track", async (req, res) => {
     await delay(1000); // Optional delay for API rate limits
 
     // Geolocation request using ipinfo.io
-    // const geoResponse = await axios.get(`${IPINFO_URL}/${ip}?token=${IPINFO_TOKEN}`);
-    // const geoData = geoResponse.data;
-    // console.log("Geolocation Data:", geoData);
+    const geoResponse = await axios.get(`${IPINFO_URL}/${ip}?token=${IPINFO_TOKEN}`);
+    const geoData = geoResponse.data;
+    console.log("Geolocation Data:", geoData);
 
-    try {
-      const geoResponse = await axios.get(`${IPINFO_URL}/${ip}?token=${IPINFO_TOKEN}`);
-      console.log("🔹 Geolocation Data:", geoResponse.data);
-    } catch (geoError) {
-      console.error("❌ Geolocation API failed:", geoError.response?.data || geoError.message);
-    }
+    // try {
+    //   const geoResponse = await axios.get(`${IPINFO_URL}/${ip}?token=${IPINFO_TOKEN}`);
+    //   console.log("🔹 Geolocation Data:", geoResponse.data);
+    // } catch (geoError) {
+    //   console.error("❌ Geolocation API failed:", geoError.response?.data || geoError.message);
+    // }
 
     const isVpn = await checkVpn(ip); // VPN check function
 
