@@ -169,14 +169,16 @@ function delay(ms) {
 // VPN check function
 async function checkVpn(ip) {
   try {
+    console.log(`Checking VPN for IP: ${ip}`);
     await delay(1000); // 1 second delay
     const vpnResponse = await axios.get(`${VPN_CHECK_URL}/${ip}`, {
       params: { key: VPN_API_KEY, vpn: 1, asn: 1 },
     });
+    console.log("ProxyCheck.io Response:", vpnResponse.data);
     const vpnData = vpnResponse.data[ip];
     return vpnData && vpnData.proxy === "yes";
   } catch (error) {
-    console.error("Error checking VPN:", error.message);
+    console.error("Error checking VPN:", error.response?.data || error.message);
     return false;
   }
 }
@@ -192,14 +194,14 @@ router.get("/api/check-vpn", async (req, res) => {
     const isVpn = await checkVpn(ip);
     res.status(200).json({ ip, isVpn });
   } catch (error) {
-    console.error("Error in VPN check API:", error.message);
+    console.error("Error in VPN check API:", error.response?.data || error.message);
     res.status(500).json({ error: "Internal server error" });
   }
 });
 
 // Tracking API
 router.get("/api/track", async (req, res) => {
-  console.log("Tracking API HIT: Query params =>", req.query); // 🔥 LOG IMMEDIATELY
+  console.log("Tracking API HIT: Query params =>", req.query); //  LOG IMMEDIATELY
   try {
     const ip = req.query.ip || requestIp.getClientIp(req);
     console.log("IP to track:", ip);
@@ -211,9 +213,16 @@ router.get("/api/track", async (req, res) => {
     await delay(1000); // Optional delay for API rate limits
 
     // Geolocation request using ipinfo.io
-    const geoResponse = await axios.get(`${IPINFO_URL}/${ip}?token=${IPINFO_TOKEN}`);
-    const geoData = geoResponse.data;
-    console.log("Geolocation Data:", geoData);
+    // const geoResponse = await axios.get(`${IPINFO_URL}/${ip}?token=${IPINFO_TOKEN}`);
+    // const geoData = geoResponse.data;
+    // console.log("Geolocation Data:", geoData);
+
+    try {
+      const geoResponse = await axios.get(`${IPINFO_URL}/${ip}?token=${IPINFO_TOKEN}`);
+      console.log("🔹 Geolocation Data:", geoResponse.data);
+    } catch (geoError) {
+      console.error("❌ Geolocation API failed:", geoError.response?.data || geoError.message);
+    }
 
     const isVpn = await checkVpn(ip); // VPN check function
 
